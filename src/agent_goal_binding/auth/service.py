@@ -13,7 +13,9 @@ from pathlib import Path
 
 from flask import Flask, jsonify, request, send_from_directory
 
-DEBUG_LOG_PATH = Path("/Users/mats/Documents/ai-sec-safety/agent-goal-binding-poc/.cursor/debug.log")
+# Project root (src/agent_goal_binding/auth -> ... -> project root)
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+DEBUG_LOG_PATH = _PROJECT_ROOT / "logs" / "debug.log"
 
 def _debug_log(message: str, data: dict, hypothesis_id: str) -> None:
     try:
@@ -239,7 +241,7 @@ def create_app(cert_path: str | Path) -> Flask:
         payload = request.get_json(silent=True) or {}
         test_ids = payload.get("test_ids") or []
         app.config["REQUEST_LOG"] = []
-        steps_file = project_root / ".cursor" / "test_steps.ndjson"
+        steps_file = project_root / "logs" / "test_steps.ndjson"
         steps_file.parent.mkdir(parents=True, exist_ok=True)
         try:
             steps_file.write_text("")
