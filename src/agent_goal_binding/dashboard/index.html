@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Goal Binding – Security Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Colors - Modern 2026 palette */
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #121218;
+      --bg-elevated: #1a1a24;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-default: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.16);
+
+      /* Text colors */
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --text-tertiary: rgba(255, 255, 255, 0.5);
+
+      /* Accent colors - gradient */
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #d946ef;
+      --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+
+      /* Status colors */
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.15);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.15);
+      --error: #ef4444;
+      --error-bg: rgba(239, 68, 68, 0.15);
+      --info: #3b82f6;
+      --info-bg: rgba(59, 130, 246, 0.15);
+
+      /* Spacing scale - Golden ratio based */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 20px;
+      --space-xl: 32px;
+      --space-2xl: 52px;
+
+      /* Typography scale - Golden ratio based */
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Roboto Mono', monospace;
+
+      --text-xs: 10px;
+      --text-sm: 12px;
+      --text-base: 14px;
+      --text-lg: 16px;
+      --text-xl: 20px;
+      --text-2xl: 24px;
+      --text-3xl: 32px;
+
+      /* Border radius */
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.2);
+
+      /* Transitions */
+      --transition-fast: 150ms ease;
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at top, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(217, 70, 239, 0.06) 0%, transparent 50%);
+    }
+
+    /* Layout container */
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Header section */
+    .header {
+      margin-bottom: var(--space-xl);
+      animation: fadeInDown 0.6s ease;
+    }
+
+    .header-title {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-xs);
+      letter-spacing: -0.02em;
+    }
+
+    .header-subtitle {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* Tab navigation */
+    .tabs {
+      display: inline-flex;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-gradient);
+      color: white;
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* Bento Grid Layout */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-lg);
+      animation: fadeInUp 0.6s ease;
+    }
+
+    /* Card base styles */
+    .card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-normal);
+    }
+
+    .card:hover {
+      border-color: var(--border-default);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .card-title::before {
+      content: '';
+      width: 3px;
+      height: 1.2em;
+      background: var(--accent-gradient);
+      border-radius: 2px;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .btn {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left var(--transition-slow);
+    }
+
+    .btn:hover::after {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-subtle);
+      border-color: var(--border-default);
+    }
+
+    /* Test list */
+    .test-list {
+      list-style: none;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: var(--space-sm);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .test-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .test-list::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: 3px;
+    }
+
+    .test-list::-webkit-scrollbar-thumb {
+      background: var(--border-default);
+      border-radius: 3px;
+    }
+
+    .test-list li {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-sm);
+      font-family: var(--font-mono);
+      transition: background var(--transition-fast);
+    }
+
+    .test-list li:last-child {
+      border-bottom: none;
+    }
+
+    .test-list li:hover {
+      background: var(--bg-elevated);
+    }
+
+    .test-list label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+    }
+
+    .test-list input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-primary);
+      cursor: pointer;
+    }
+
+    /* Results section */
+    .results {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-md);
+    }
+
+    .badge.pass {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .badge.fail {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .results pre {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      font-size: var(--text-xs);
+      font-family: var(--font-mono);
+      line-height: 1.5;
+      overflow: auto;
+      max-height: 320px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-secondary);
+    }
+
+    .results pre:empty {
+      display: none;
+    }
+
+    /* Steps section */
+    .step-card {
+      padding: var(--space-md);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-md);
+      font-size: var(--text-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .step-card:hover {
+      border-color: var(--border-default);
+    }
+
+    .step-card .step-head {
+      font-weight: 600;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .step-card.blocked .step-head {
+      color: var(--error);
+    }
+
+    .step-card.authorized .step-head {
+      color: var(--success);
+    }
+
+    .step-card .step-body {
+      color: var(--text-secondary);
+    }
+
+    .step-card .step-body pre {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm);
+      margin-top: var(--space-sm);
+      font-size: var(--text-xs);
+      font-family: var(--font-mono);
+      overflow-x: auto;
+    }
+
+    /* Security overview cards */
+    .security-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .security-score {
+      font-size: 4rem;
+      font-weight: 700;
+      text-align: center;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: var(--space-lg) 0;
+      line-height: 1;
+    }
+
+    .security-status {
+      text-align: center;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: var(--text-xs);
+      font-weight: 500;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+      transition: all var(--transition-normal);
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-default);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    /* Category results */
+    .category-results {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    .category-results h4 {
+      font-size: var(--text-base);
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--text-primary);
+    }
+
+    .report-json-container {
+      max-height: 360px;
+      overflow: auto;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+    }
+
+    .report-json-pre {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: 1.5;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .probe-list {
+      list-style: none;
+      padding: 0;
+      margin: var(--space-md) 0;
+    }
+
+    .probe-list li {
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      border-left: 3px solid var(--border-default);
+      background: var(--bg-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: var(--text-sm);
+    }
+
+    .probe-list li.pass {
+      border-left-color: var(--success);
+    }
+
+    .probe-list li.fail {
+      border-left-color: var(--error);
+    }
+
+    .probe-list small {
+      display: block;
+      color: var(--text-tertiary);
+      margin-top: var(--space-xs);
+      font-size: var(--text-xs);
+    }
+
+    /* Loading states */
+    .loading {
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+      padding: var(--space-lg);
+      text-align: center;
+    }
+
+    /* Messages */
+    .muted {
+      color: var(--text-tertiary);
+      font-size: var(--text-sm);
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: var(--text-sm);
+    }
+
+    /* Score colors */
+    .score-success {
+      color: var(--success);
+    }
+
+    .score-warning {
+      color: var(--warning);
+    }
+
+    .score-error {
+      color: var(--error);
+    }
+
+    /* Tab content */
+    .tab-content {
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tab-content.hidden {
+      display: none;
+    }
+
+    /* Details/accordion */
+    details {
+      margin-top: var(--space-md);
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 500;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      padding: var(--space-sm);
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
+    }
+
+    details summary:hover {
+      background: var(--bg-secondary);
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::after {
+      content: '▶';
+      margin-left: var(--space-sm);
+      font-size: var(--text-xs);
+      transition: transform var(--transition-fast);
+    }
+
+    details[open] summary::after {
+      transform: rotate(90deg);
+    }
+
+    details[open] > *:not(summary) {
+      animation: slideDown 0.3s ease;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Grid spans for bento layout */
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .span-8, .span-4, .span-6 {
+        grid-column: span 12;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: var(--space-lg);
+      }
+
+      .header-title {
+        font-size: var(--text-2xl);
+      }
+
+      .toolbar {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="header-title">Agent Goal Binding</h1>
+      <p class="header-subtitle">Cryptographic verification and security testing for AI agents</p>
+
+      <div class="tabs">
+        <button type="button" id="testsTab" class="tab-btn active">Attack Tests</button>
+        <button type="button" id="securityTab" class="tab-btn">Security Scans</button>
+      </div>
+    </header>
+
+    <!-- Attack Tests Tab -->
+    <div class="tab-content" id="testsTabContent">
+      <div class="bento-grid">
+        <!-- Toolbar Section -->
+        <div class="card span-12">
+          <div class="card-title">Test Controls</div>
+          <div class="toolbar">
+            <button type="button" id="runAll" class="btn">Run All Tests</button>
+            <button type="button" id="runSelected" class="btn btn-secondary">Run Selected</button>
+            <button type="button" id="runSelectedAttacks" class="btn btn-secondary">Run Selected Attacks</button>
+            <button type="button" id="runAllAttacks" class="btn btn-secondary">Run All Attacks</button>
+            <button type="button" id="refreshList" class="btn btn-secondary">Refresh List</button>
+          </div>
+        </div>
+
+        <!-- Attack Tests List -->
+        <div class="card span-6">
+          <div class="card-title">Attack Scenarios</div>
+          <div id="attackTestsContainer">
+            <p class="loading" id="attackLoading">Loading attack scenarios…</p>
+            <ul class="test-list" id="attackTestsList" hidden></ul>
+          </div>
+        </div>
+
+        <!-- All Tests List -->
+        <div class="card span-6">
+          <div class="card-title">All Tests</div>
+          <div id="testListContainer">
+            <p class="loading" id="loading">Loading tests…</p>
+            <ul class="test-list" id="testList" hidden></ul>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="card span-12">
+          <div class="card-title">Test Results</div>
+          <div id="resultSummary"></div>
+          <pre id="resultOutput"></pre>
+
+          <div class="steps-section" id="stepsSection" hidden style="margin-top: var(--space-lg);">
+            <div class="card-title">Probes and Agent Behavior</div>
+            <div id="stepsByTest"></div>
+          </div>
+
+          <div class="request-log-section" id="requestLogSection" hidden style="margin-top: var(--space-lg);">
+            <div class="card-title">Server Request Log</div>
+            <pre class="request-log" id="requestLog"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Scans Tab -->
+    <div class="tab-content hidden" id="securityTabContent">
+      <div class="bento-grid">
+        <!-- Security Status Overview -->
+        <div class="card span-12" id="securityStatus">
+          <p class="loading">Loading security status…</p>
+        </div>
+
+        <!-- Security Tests List -->
+        <div class="card span-12">
+          <div class="card-title">Security Tests</div>
+          <div class="toolbar">
+            <button type="button" id="runSecurityAll" class="btn">Run All</button>
+            <button type="button" id="runSelectedSecurity" class="btn btn-secondary">Run Selected</button>
+          </div>
+          <div id="securityTestsListContainer">
+            <p class="loading" id="securityTestsLoading">Loading security tests…</p>
+            <ul class="test-list" id="securityTestsList" hidden></ul>
+          </div>
+        </div>
+
+        <!-- Garak Security Scans -->
+        <div class="card span-12">
+          <div class="card-title">Garak Security Scans</div>
+          <div class="toolbar">
+            <button type="button" id="runGarakAll" class="btn">Run All Probes</button>
+            <button type="button" id="runGarakJailbreak" class="btn btn-secondary">Jailbreak</button>
+            <button type="button" id="runGarakDan" class="btn btn-secondary">DAN Attacks</button>
+          </div>
+          <div id="garakResults"></div>
+        </div>
+
+        <!-- PurpleLlama CyberSecEval -->
+        <div class="card span-12">
+          <div class="card-title">PurpleLlama CyberSecEval</div>
+          <div class="toolbar">
+            <button type="button" id="runPurplellamaAll" class="btn">Run Full Evaluation</button>
+            <button type="button" id="runPurplellamaPromptInj" class="btn btn-secondary">Prompt Injection</button>
+            <button type="button" id="runPurplellamaCodeInt" class="btn btn-secondary">Code Interpreter</button>
+          </div>
+          <div id="purplellamaResults"></div>
+        </div>
+
+        <!-- Security Reports -->
+        <div class="card span-12">
+          <div class="card-title">Security Reports</div>
+          <div class="toolbar">
+            <button type="button" id="loadReportsBtn" class="btn btn-secondary">Load Reports</button>
+          </div>
+          <div id="securityReportsList" class="reports-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const base = window.location.origin;
+
+    // Element references
+    const runAllBtn = document.getElementById('runAll');
+    const runSelectedBtn = document.getElementById('runSelected');
+    const refreshBtn = document.getElementById('refreshList');
+    const loadingEl = document.getElementById('loading');
+    const testListEl = document.getElementById('testList');
+    const resultSummary = document.getElementById('resultSummary');
+    const resultOutput = document.getElementById('resultOutput');
+    const stepsSection = document.getElementById('stepsSection');
+    const stepsByTestEl = document.getElementById('stepsByTest');
+    const requestLogSection = document.getElementById('requestLogSection');
+    const requestLogEl = document.getElementById('requestLog');
+    const attackLoadingEl = document.getElementById('attackLoading');
+    const attackTestsListEl = document.getElementById('attackTestsList');
+    const securityTestsLoadingEl = document.getElementById('securityTestsLoading');
+    const securityTestsListEl = document.getElementById('securityTestsList');
+    let attackTestsList = [];
+    let securityTestsList = [];
+
+    async function loadTests() {
+      loadingEl.textContent = 'Loading tests…';
+      attackLoadingEl.textContent = 'Loading…';
+      testListEl.hidden = true;
+      attackTestsListEl.hidden = true;
+      try {
+        const r = await fetch(base + '/api/tests');
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Failed to load tests');
+        attackTestsList = data.attack_tests || [];
+        renderAttackTests(attackTestsList);
+      } catch (e) {
+        loadingEl.textContent = '';
+        testListEl.hidden = false;
+        testListEl.innerHTML = '<li class="error-msg">' + e.message + '</li>';
+        attackLoadingEl.textContent = '';
+        attackTestsListEl.hidden = false;
+        attackTestsListEl.innerHTML = '<li class="error-msg">' + e.message + '</li>';
+      }
+    }
+
+    function renderAttackTests(attackTests) {
+      attackLoadingEl.hidden = true;
+      attackTestsListEl.hidden = false;
+      if (!attackTests.length) {
+        attackTestsListEl.innerHTML = '<li class="muted">No attack tests</li>';
+        return;
+      }
+      attackTestsListEl.innerHTML = attackTests.map(function (a) {
+        return '<li><label><input type="checkbox" name="atid" value="' + escapeAttr(a.id) + '"><span>' + escapeText(a.label) + '</span></label></li>';
+      }).join('');
+    }
+
+    function renderTests(tests) {
+      loadingEl.hidden = true;
+      testListEl.hidden = false;
+      testListEl.innerHTML = tests.map(id => `
+        <li>
+          <label>
+            <input type="checkbox" name="tid" value="${escapeAttr(id)}">
+            <span>${escapeText(id)}</span>
+          </label>
+        </li>
+      `).join('');
+    }
+
+    function escapeAttr(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function escapeText(s) {
+      return escapeAttr(s);
+    }
+
+    function getSelectedIds() {
+      return Array.from(document.querySelectorAll('input[name=tid]:checked')).map(el => el.value);
+    }
+
+    function getAllAttackIds() {
+      return attackTestsList.map(function (a) { return a.id; });
+    }
+
+    function getSelectedSecurityIds() {
+      return Array.from(document.querySelectorAll('input[name=stid]:checked')).map(el => el.value);
+    }
+
+    function getAllSecurityIds() {
+      return securityTestsList.map(function (s) { return s.id; });
+    }
+
+    async function loadSecurityTests() {
+      securityTestsLoadingEl.textContent = 'Loading security tests…';
+      securityTestsListEl.hidden = true;
+      try {
+        const r = await fetch(base + '/api/security/tests');
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Failed to load security tests');
+        securityTestsList = data.security_tests || [];
+        renderSecurityTests(securityTestsList);
+      } catch (e) {
+        securityTestsLoadingEl.textContent = '';
+        securityTestsListEl.hidden = false;
+        securityTestsListEl.innerHTML = '<li class="error-msg">' + e.message + '</li>';
+      }
+    }
+
+    function renderSecurityTests(securityTests) {
+      securityTestsLoadingEl.hidden = true;
+      securityTestsListEl.hidden = false;
+      if (!securityTests.length) {
+        securityTestsListEl.innerHTML = '<li class="muted">No security tests available</li>';
+        return;
+      }
+      securityTestsListEl.innerHTML = securityTests.map(function (s) {
+        return '<li><label><input type="checkbox" name="stid" value="' + escapeAttr(s.id) + '"><span>' + escapeText(s.label || s.id) + '</span></label></li>';
+      }).join('');
+    }
+
+    async function runSecurityTests(testIds) {
+      const runAllBtn = document.getElementById('runSecurityAll');
+      const runSelectedBtn = document.getElementById('runSelectedSecurity');
+      
+      if (runAllBtn) runAllBtn.disabled = true;
+      if (runSelectedBtn) runSelectedBtn.disabled = true;
+      
+      resultSummary.innerHTML = '';
+      resultOutput.textContent = 'Running security tests…';
+      
+      try {
+        const r = await fetch(base + '/api/security/tests/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(testIds.length ? { test_ids: testIds } : {})
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.message || data.error || `HTTP ${r.status}`);
+        
+        const out = [data.stdout || '', data.stderr || ''].filter(Boolean).join('\n') || '(no output)';
+        resultOutput.textContent = out;
+        const badge = data.passed !== false && data.exit_code === 0
+          ? '<span class="badge pass">PASSED</span>'
+          : '<span class="badge fail">FAILED</span>';
+        resultSummary.innerHTML = badge + (data.error ? ' ' + escapeAttr(data.error) : '');
+        
+        // Refresh security tests list to update any status
+        await loadSecurityTests();
+      } catch (e) {
+        resultOutput.textContent = e.message;
+        resultSummary.innerHTML = '<span class="badge fail">Error</span>';
+      } finally {
+        if (runAllBtn) runAllBtn.disabled = false;
+        if (runSelectedBtn) runSelectedBtn.disabled = false;
+      }
+    }
+
+    function renderStep(step) {
+      const s = step.step;
+      const event = step.event;
+      if (event === 'chat') {
+        return `
+          <div class="step-card">
+            <div class="step-head">Step ${s} – Probe: ${escapeAttr(step.probe || 'user_message')}</div>
+            <div class="step-body">
+              <div><strong>User:</strong> ${escapeAttr(step.message || '')}</div>
+              <div><strong>Agent:</strong> ${escapeAttr(step.response || '')}</div>
+              ${step.conversational_goals && step.conversational_goals.length ? '<div><strong>Goals after turn:</strong> ' + escapeAttr(step.conversational_goals.join('; ')) + '</div>' : ''}
+            </div>
+          </div>
+        `;
+      }
+      if (event === 'action_attempt') {
+        return `
+          <div class="step-card">
+            <div class="step-head">Step ${s} – Probe: ${escapeAttr(step.probe || 'execute_action')}</div>
+            <div class="step-body">
+              <div><strong>Action:</strong> ${escapeAttr(step.action || '')} ${step.parameters && Object.keys(step.parameters || {}).length ? '(' + escapeAttr(JSON.stringify(step.parameters)) + ')' : ''}</div>
+              ${step.conversational_goals && step.conversational_goals.length ? '<div><strong>Current goals:</strong> ' + escapeAttr(step.conversational_goals.join('; ')) + '</div>' : ''}
+            </div>
+          </div>
+        `;
+      }
+      if (event === 'action_result') {
+        const cls = step.authorized ? 'authorized' : 'blocked';
+        const statusCode = step.http_response && step.http_response.status_code;
+        const body = step.http_response && step.http_response.body;
+        let bodyHtml = '';
+        if (body !== undefined && body !== null) {
+          bodyHtml = '<div><strong>HTTP response body:</strong><pre>' + escapeAttr(JSON.stringify(body, null, 2)) + '</pre></div>';
+        } else {
+          bodyHtml = step.authorized ? '<div><strong>Result:</strong> ' + escapeAttr(JSON.stringify(step.result || {})) + '</div>' : '<div><strong>Reason:</strong> ' + escapeAttr(step.error || '') + '</div>';
+        }
+        return `
+          <div class="step-card ${cls}">
+            <div class="step-head">Step ${s} – Auth service: ${statusCode ? 'HTTP ' + statusCode : (step.authorized ? 'Authorized' : 'Blocked')}</div>
+            <div class="step-body">
+              ${bodyHtml}
+            </div>
+          </div>
+        `;
+      }
+      return '<div class="step-card"><div class="step-head">Step ' + s + ' – ' + escapeAttr(event) + '</div><pre>' + escapeAttr(JSON.stringify(step)) + '</pre></div>';
+    }
+
+    function renderRequestLog(requestLog) {
+      if (!requestLog || !requestLog.length) {
+        requestLogSection.hidden = true;
+        requestLogEl.textContent = '';
+        return;
+      }
+      requestLogSection.hidden = false;
+      requestLogEl.innerHTML = requestLog.map(function (r) {
+        var line = r.method + ' ' + r.path + ' HTTP/1.1 ' + r.status;
+        return '<span class="log-line status-' + r.status + '">' + escapeAttr(line) + '</span>';
+      }).join('');
+    }
+
+    function attackLabel(testId) {
+      var a = attackTestsList.find(function (x) { return x.id === testId; });
+      return a ? a.label : testId;
+    }
+
+    function renderSteps(stepsByTest) {
+      if (!stepsByTest || !Object.keys(stepsByTest).length) {
+        stepsSection.hidden = true;
+        return;
+      }
+      stepsSection.hidden = false;
+      stepsByTestEl.innerHTML = Object.entries(stepsByTest).map(function (entry) {
+        var testId = entry[0];
+        var steps = entry[1];
+        var label = attackLabel(testId);
+        var chatSteps = steps.filter(function (s) { return s.event === 'chat'; });
+        var actionAttempts = steps.filter(function (s) { return s.event === 'action_attempt'; });
+        var actionResults = steps.filter(function (s) { return s.event === 'action_result'; });
+        var promptsHtml = chatSteps.length ? '<div style="margin-bottom: 1rem;"><strong>Prompts used</strong><ul style="margin: 0.5rem 0 0 1.25rem; font-size: 0.8125rem;">' + chatSteps.map(function (s) {
+          return '<li>' + escapeAttr(s.message || '') + '</li>';
+        }).join('') + '</ul></div>' : '';
+        var behaviourHtml = chatSteps.length ? '<div style="margin-bottom: 1rem;"><strong>Agent behaviour</strong><div>' + chatSteps.map(renderStep).join('') + '</div></div>' : '';
+        var verificationHtml = '';
+        for (var i = 0; i < actionAttempts.length; i++) {
+          verificationHtml += renderStep(actionAttempts[i]);
+          if (i < actionResults.length) verificationHtml += renderStep(actionResults[i]);
+        }
+        if (verificationHtml) {
+          verificationHtml = '<div style="margin-bottom: 1rem;"><strong>Verification and tool steps</strong><div>' + verificationHtml + '</div></div>';
+        }
+        return '<details class="card" open><summary>' + escapeText(label) + '</summary><div style="margin-top: 1rem;">' + promptsHtml + behaviourHtml + verificationHtml + '</div></details>';
+      }).join('');
+    }
+
+    async function runTests(testIds) {
+      runAllBtn.disabled = true;
+      runSelectedBtn.disabled = true;
+      document.getElementById('runSelectedAttacks').disabled = true;
+      document.getElementById('runAllAttacks').disabled = true;
+      resultSummary.innerHTML = '';
+      resultOutput.textContent = 'Running…';
+      stepsSection.hidden = true;
+      stepsByTestEl.innerHTML = '';
+      requestLogSection.hidden = true;
+      requestLogEl.textContent = '';
+      try {
+        const r = await fetch(base + '/api/tests/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(testIds.length ? { test_ids: testIds } : {}),
+        });
+        const data = await r.json();
+        const out = [data.stdout || '', data.stderr || ''].filter(Boolean).join('\n') || '(no output)';
+        resultOutput.textContent = out;
+        const badge = data.passed !== false && data.exit_code === 0
+          ? '<span class="badge pass">PASSED</span>'
+          : '<span class="badge fail">FAILED</span>';
+        resultSummary.innerHTML = badge + (data.error ? ' ' + escapeAttr(data.error) : '');
+        renderSteps(data.steps || {});
+        renderRequestLog(data.request_log || []);
+      } catch (e) {
+        resultOutput.textContent = e.message;
+        resultSummary.innerHTML = '<span class="badge fail">Error</span>';
+      } finally {
+        runAllBtn.disabled = false;
+        runSelectedBtn.disabled = false;
+        document.getElementById('runSelectedAttacks').disabled = false;
+        document.getElementById('runAllAttacks').disabled = false;
+      }
+    }
+
+    runAllBtn.addEventListener('click', () => runTests([]));
+    runSelectedBtn.addEventListener('click', () => runTests(getSelectedIds()));
+    document.getElementById('runSelectedAttacks')?.addEventListener('click', () => {
+      const selectedAttacks = Array.from(document.querySelectorAll('input[name=atid]:checked')).map(el => el.value);
+      runTests(selectedAttacks);
+    });
+    document.getElementById('runAllAttacks')?.addEventListener('click', () => runTests(getAllAttackIds()));
+    refreshBtn?.addEventListener('click', loadTests);
+
+    // Security testing tab functionality
+    const securityTabBtn = document.getElementById('securityTab');
+    const testsTabBtn = document.getElementById('testsTab');
+    const securityTabContent = document.getElementById('securityTabContent');
+    const testsTabContent = document.getElementById('testsTabContent');
+
+    securityTabBtn?.addEventListener('click', () => {
+      securityTabBtn.classList.add('active');
+      testsTabBtn?.classList.remove('active');
+      securityTabContent?.classList.remove('hidden');
+      testsTabContent?.classList.add('hidden');
+      loadSecurityStatus();
+    });
+
+    testsTabBtn?.addEventListener('click', () => {
+      testsTabBtn.classList.add('active');
+      securityTabBtn.classList.remove('active');
+      testsTabContent.classList.remove('hidden');
+      securityTabContent?.classList.add('hidden');
+    });
+
+    async function loadSecurityStatus() {
+      const statusEl = document.getElementById('securityStatus');
+      if (statusEl) statusEl.innerHTML = '<p class="loading">Loading security status…</p>';
+
+      try {
+        const r = await fetch(base + '/api/security/status');
+        const data = await r.json();
+        if (!r.ok) {
+          throw new Error(data.message || data.error || `HTTP ${r.status}`);
+        }
+        renderSecurityStatus(data);
+      } catch (e) {
+        console.error('Failed to load security status:', e);
+        if (statusEl) {
+          statusEl.innerHTML = `<div class="card"><p class="error-msg">Failed to load security status: ${escapeText(e.message)}</p></div>`;
+        }
+      }
+    }
+
+    function renderSecurityStatus(status) {
+      const statusEl = document.getElementById('securityStatus');
+      if (!statusEl) return;
+
+      const score = status.merkle_chain_verified ? status.security_score || 100 : 50;
+      const scoreColor = score > 80 ? '#22c55e' : score > 50 ? '#f59e0b' : '#ef4444';
+
+      statusEl.innerHTML = `
+        <div class="security-overview">
+          <div class="card">
+            <div class="card-title">Agent Status</div>
+            <p style="margin-bottom: 0.5rem;"><strong>Agent ID:</strong> ${escapeText(status.agent_id || 'unknown')}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>Certificate:</strong> ${status.certificate_loaded ? '<span class="badge pass">Loaded</span>' : '<span class="badge fail">Not Loaded</span>'}</p>
+            <p style="margin-bottom: 0.5rem;"><strong>Merkle Chain:</strong> ${status.merkle_chain_length || 0} blocks</p>
+            <p><strong>Chain Verified:</strong> ${status.merkle_chain_verified ? '<span class="badge pass">Verified</span>' : '<span class="badge fail">Failed</span>'}</p>
+          </div>
+          <div class="card">
+            <div class="card-title">Security Score</div>
+            <div class="security-score" style="background: linear-gradient(135deg, ${scoreColor} 0%, ${scoreColor}99 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${score}/100</div>
+            <p class="security-status">Status: ${status.status || 'monitoring'}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    async function runGarakScan(categories = []) {
+      const btn = document.getElementById('runGarakAll');
+      const resultsEl = document.getElementById('garakResults');
+      if (btn) btn.disabled = true;
+      if (resultsEl) resultsEl.innerHTML = '<p class="loading">Running scan…</p>';
+
+      try {
+        const r = await fetch(base + '/api/security/garak/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categories.length ? { categories } : {})
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          throw new Error(data.message || data.error || `HTTP ${r.status}`);
+        }
+        renderGarakResults(data);
+      } catch (e) {
+        console.error('Garak scan failed:', e);
+        if (resultsEl) {
+          resultsEl.innerHTML = `<p class="error-msg">Scan failed: ${escapeText(e.message)}</p>`;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function runPurplellamaEval(categories = []) {
+      const btn = document.getElementById('runPurplellamaAll');
+      const resultsEl = document.getElementById('purplellamaResults');
+      if (btn) btn.disabled = true;
+      if (resultsEl) resultsEl.innerHTML = '<p class="loading">Running evaluation…</p>';
+
+      try {
+        const r = await fetch(base + '/api/security/purplellama/eval', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categories.length ? { categories } : {})
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          throw new Error(data.message || data.error || `HTTP ${r.status}`);
+        }
+        renderPurplellamaResults(data);
+      } catch (e) {
+        console.error('PurpleLlama evaluation failed:', e);
+        if (resultsEl) {
+          resultsEl.innerHTML = `<p class="error-msg">Evaluation failed: ${escapeText(e.message)}</p>`;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function renderGarakResults(results) {
+      const container = document.getElementById('garakResults');
+      if (!container) return;
+
+      const summary = results.summary || {};
+      const scoreColor = summary.security_score > 80 ? '#22c55e' : summary.security_score > 50 ? '#f59e0b' : '#ef4444';
+
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${summary.total_probes || 0}</div>
+            <div class="stat-label">Total Probes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #22c55e;">${summary.blocked_attacks || 0}</div>
+            <div class="stat-label">Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #ef4444;">${summary.successful_attacks || 0}</div>
+            <div class="stat-label">Successful</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: ${scoreColor};">${summary.security_score || 0}</div>
+            <div class="stat-label">Security Score</div>
+          </div>
+        </div>
+        ${renderProbeResults(results.probe_results || [])}
+      `;
+    }
+
+    function renderPurplellamaResults(results) {
+      const container = document.getElementById('purplellamaResults');
+      if (!container) return;
+
+      const summary = results.summary || {};
+      const scoreColor = summary.overall_security_score > 80 ? '#22c55e' : summary.overall_security_score > 50 ? '#f59e0b' : '#ef4444';
+      const severityClass = summary.worst_severity?.toLowerCase() || 'none';
+      const severityColors = {
+        'none': '#22c55e',
+        'low': '#22c55e',
+        'medium': '#f59e0b',
+        'high': '#f97316',
+        'critical': '#ef4444'
+      };
+
+      container.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${summary.total_tests || 0}</div>
+            <div class="stat-label">Total Tests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #22c55e;">${summary.total_blocked_attacks || 0}</div>
+            <div class="stat-label">Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: #ef4444;">${summary.total_successful_attacks || 0}</div>
+            <div class="stat-label">Successful</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: ${scoreColor};">${summary.overall_security_score || 0}</div>
+            <div class="stat-label">Security Score</div>
+          </div>
+        </div>
+        <div style="margin-bottom: 1rem;"><strong>Worst Severity:</strong> <span style="color: ${severityColors[severityClass]}; font-weight: 600;">${(summary.worst_severity || 'NONE').toUpperCase()}</span></div>
+        ${renderCategoryResults(results.categories || [])}
+      `;
+    }
+
+    function renderProbeResults(probes) {
+      if (!probes.length) return '<p class="muted">No probe results available</p>';
+
+      return probes.map(category => `
+        <div class="category-results">
+          <h4>${escapeText(category.category || 'Unknown')}</h4>
+          <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 0.5rem;">
+            <strong>Total:</strong> ${category.total_probes || 0} |
+            <strong>Blocked:</strong> ${category.blocked_attacks || 0} |
+            <strong>Success Rate:</strong> ${(category.success_rate * 100 || 0).toFixed(1)}%
+          </p>
+          <details>
+            <summary>View Probes</summary>
+            <ul class="probe-list">
+              ${(category.probes || []).map(probe => `
+                <li class="${probe.success ? 'pass' : 'fail'}">
+                  <strong>${probe.success ? 'PASS' : 'FAIL'}</strong> ${escapeText(probe.prompt || '')}
+                  <br><small>${probe.reason || ''}</small>
+                </li>
+              `).join('')}
+            </ul>
+          </details>
+        </div>
+      `).join('');
+    }
+
+    function renderCategoryResults(categories) {
+      if (!categories.length) return '';
+
+      return categories.map(cat => `
+        <div class="category-results">
+          <h4>${escapeText(cat.category || 'Unknown')}</h4>
+          <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <strong>Description:</strong> ${escapeText(cat.description || '')}
+          </p>
+          <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 0.25rem;">
+            <strong>Severity:</strong> ${escapeText((cat.severity || 'NONE').toUpperCase())}
+          </p>
+          <p style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: 0.5rem;">
+            <strong>Total:</strong> ${cat.total_tests || 0} |
+            <strong>Blocked:</strong> ${cat.blocked_attacks || 0} |
+            <strong>Success Rate:</strong> ${(cat.success_rate * 100 || 0).toFixed(1)}%
+          </p>
+          <details>
+            <summary>View Tests</summary>
+            <ul class="probe-list">
+              ${(cat.tests || []).map(test => `
+                <li class="${test.attack_success ? 'pass' : 'fail'}">
+                  <strong>${test.attack_success ? 'FAIL' : 'PASS'}</strong> ${escapeText(test.prompt || '')}
+                  <br><small>${test.reason || ''}</small>
+                </li>
+              `).join('')}
+            </ul>
+          </details>
+        </div>
+      `).join('');
+    }
+
+    async function loadSecurityReports() {
+      const container = document.getElementById('securityReportsList');
+      if (container) container.innerHTML = '<p class="loading">Loading reports…</p>';
+
+      try {
+        const r = await fetch(base + '/api/security/reports');
+        const data = await r.json();
+        if (!r.ok) {
+          throw new Error(data.message || data.error || `HTTP ${r.status}`);
+        }
+        renderSecurityReports(data.reports || []);
+      } catch (e) {
+        console.error('Failed to load reports:', e);
+        if (container) {
+          container.innerHTML = `<p class="error-msg">Failed to load reports: ${escapeText(e.message)}</p>`;
+        }
+      }
+    }
+
+    function renderSecurityReports(reports) {
+      const container = document.getElementById('securityReportsList');
+      if (!container) return;
+
+      if (!reports.length) {
+        container.innerHTML = '<p class="muted">No security reports available</p>';
+        return;
+      }
+
+      container.innerHTML = reports.map(report => {
+        const typeColors = {
+          'garak': '#8b5cf6',
+          'purplellama': '#22c55e',
+          'custom': '#f59e0b',
+          'unknown': '#71717a'
+        };
+        const typeColor = typeColors[report.type] || typeColors['unknown'];
+        const score = report.summary?.security_score || report.summary?.overall_security_score || 0;
+        const scoreClass = score > 80 ? 'success' : score > 50 ? 'warning' : 'error';
+
+        return `
+          <div class="category-results">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge" style="background: ${typeColor}20; color: ${typeColor}; border-color: ${typeColor}40;">${(report.type || 'unknown').toUpperCase()}</span>
+              <span style="color: var(--text-tertiary); font-size: 0.8125rem;">${escapeText(report.modified?.split('T')[0] || '')}</span>
+            </div>
+            <p style="margin-bottom: 0.25rem;"><strong>Score:</strong> <span class="score-${scoreClass}" style="font-weight: 600;">${score}/100</span></p>
+            <p style="margin-bottom: 0.75rem;"><strong>File:</strong> ${escapeText(report.filename || '')}</p>
+            <button type="button" class="btn btn-secondary view-details-btn" data-filename="${escapeAttr(report.filename || '')}">View Details</button>
+            <div class="report-json-container" style="display: none; margin-top: 0.75rem;">
+              <pre class="report-json-pre"></pre>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Event listeners for security buttons
+    document.getElementById('runGarakAll')?.addEventListener('click', () => runGarakScan());
+    document.getElementById('runGarakJailbreak')?.addEventListener('click', () => runGarakScan(['jailbreak']));
+    document.getElementById('runGarakDan')?.addEventListener('click', () => runGarakScan(['dan']));
+    document.getElementById('runPurplellamaAll')?.addEventListener('click', () => runPurplellamaEval());
+    document.getElementById('runPurplellamaPromptInj')?.addEventListener('click', () => runPurplellamaEval(['prompt_injection']));
+    document.getElementById('runPurplellamaCodeInt')?.addEventListener('click', () => runPurplellamaEval(['code_interpreter']));
+    document.getElementById('loadReportsBtn')?.addEventListener('click', loadSecurityReports);
+    document.getElementById('runSecurityAll')?.addEventListener('click', () => runSecurityTests([]));
+    document.getElementById('runSelectedSecurity')?.addEventListener('click', () => runSecurityTests(getSelectedSecurityIds()));
+
+    document.getElementById('securityReportsList')?.addEventListener('click', async function (e) {
+      const btn = e.target.closest('.view-details-btn');
+      if (!btn) return;
+      const filename = btn.getAttribute('data-filename');
+      if (!filename) return;
+      const card = btn.closest('.category-results');
+      if (!card) return;
+      const jsonContainer = card.querySelector('.report-json-container');
+      const jsonPre = card.querySelector('.report-json-pre');
+      if (!jsonContainer || !jsonPre) return;
+      if (jsonContainer.style.display !== 'none') {
+        jsonContainer.style.display = 'none';
+        return;
+      }
+      if (jsonPre.textContent.trim()) {
+        jsonContainer.style.display = 'block';
+        return;
+      }
+      jsonContainer.style.display = 'block';
+      jsonPre.textContent = 'Loading…';
+      try {
+        const r = await fetch(base + '/api/security/reports/' + encodeURIComponent(filename));
+        if (!r.ok) throw new Error(r.status === 404 ? 'Report not found' : 'Failed to load report');
+        const data = await r.json();
+        jsonPre.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        jsonPre.textContent = 'Error: ' + (err.message || 'Failed to load report');
+      }
+    });
+
+    // Initial load
+    loadTests();
+    loadSecurityStatus();
+    loadSecurityTests();
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-goal-binding"
+version = "0.1.0"
+description = "Cryptographic goal-binding and authorization for AI agents"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Matstalktech", email = "contact@matstalktech.com"},
+]
+dependencies = [
+    "flask>=3.0",
+    "python-gnupg>=0.5",
+    "requests>=2.31",
+    "urllib3<2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=1.0",
+    "garak>=0.9.0",
+    "aiolimiter>=1.1",
+]
+security = [
+    "garak>=0.9.0",
+    "pytest-asyncio>=1.0",
+]
+
+[project.scripts]
+agent-sign = "agent_goal_binding.crypto.signing:main"
+agent-auth-server = "agent_goal_binding.auth.service:main"
+
+[project.urls]
+Homepage = "https://github.com/matstalktech/agent-goal-binding"
+Repository = "https://github.com/matstalktech/agent-goal-binding"
+Documentation = "https://github.com/matstalktech/agent-goal-binding#readme"
+"Bug Tracker" = "https://github.com/matstalktech/agent-goal-binding/issues"
+"Security Policy" = "https://github.com/matstalktech/agent-goal-binding/security"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
